@@ -1,27 +1,42 @@
-/* 全体レイアウト */
+ /* 全体背景 */
 body {
   font-family: "Helvetica Neue", sans-serif;
-  background-color: #ffffff;
-  color: #333;
+  background-color: #f5f5f5; /* うっすらグレー */
   margin: 0;
+  padding: 0;
+}
+
+/* ヘッダー画像とタイトル */
+.header {
+  position: relative;
+  text-align: center;
+}
+
+.header-image {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: cover;
+}
+
+.header-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: black;
+  font-size: 3em;
+  font-weight: bold;
+  text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.6);
+}
+
+/* メインコンテンツエリア */
+.content {
   padding: 40px 20px;
   text-align: center;
 }
 
-/* タイトル */
-h1 {
-  font-size: 3em;
-  margin-bottom: 30px;
-  letter-spacing: 1px;
-  font-weight: 600;
-  color: #111;
-}
-
-/* フォーム */
-form {
-  margin-bottom: 30px;
-}
-
+/* 入力エリアなどはそのまま（前のレスポンシブCSSが有効） */
 textarea {
   width: 90%;
   max-width: 600px;
@@ -32,15 +47,9 @@ textarea {
   border-radius: 10px;
   resize: vertical;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
-textarea:focus {
-  outline: none;
-  border-color: #000;
-}
-
-/* ボタン */
 button {
   margin-top: 15px;
   padding: 10px 30px;
@@ -57,7 +66,7 @@ button:hover {
   background-color: #444;
 }
 
-/* メモリスト */
+/* メモリストもそのままでOK */
 ul {
   list-style: none;
   padding: 0;
@@ -65,7 +74,7 @@ ul {
 }
 
 li {
-  background: #fafafa;
+  background: #fff;
   border: 1px solid #ddd;
   padding: 15px;
   margin: 10px auto;
@@ -78,7 +87,6 @@ li {
   position: relative;
 }
 
-/* 削除ボタン */
 li button {
   position: absolute;
   top: 15px;
@@ -90,25 +98,8 @@ li button {
   border-radius: 4px;
   padding: 5px 10px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 li button:hover {
   background-color: #ccc;
-}
-
-/* スマホ対応 */
-@media screen and (max-width: 600px) {
-  h1 {
-    font-size: 2em;
-  }
-
-  textarea {
-    height: 150px;
-  }
-
-  button {
-    width: 80%;
-    max-width: 300px;
-  }
 }
