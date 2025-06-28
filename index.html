@@ -6,12 +6,24 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>TM memo taker</h1>
-  <form id="memoForm">
-    <textarea id="memoInput" placeholder="メモを入力..."></textarea>
-    <button type="submit">追加</button>
-  </form>
-  <ul id="memoList"></ul>
+
+  <!-- 写真ヘッダーエリア -->
+  <div class="header">
+    <img src="header.jpg" class="header-image" alt="ヘッダー画像" />
+    <div class="header-title">TM memo taker</div>
+  </div>
+
+  <!-- メモ入力＆リスト表示エリア -->
+  <div class="content">
+    <form id="memoForm">
+      <textarea id="memoInput" placeholder="メモを入力..."></textarea>
+      <br />
+      <button type="submit">追加</button>
+    </form>
+    <ul id="memoList"></ul>
+  </div>
+
+  <!-- Firebase連携用のscript.js（モジュール指定） -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
