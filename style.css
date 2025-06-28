@@ -1,11 +1,13 @@
+/* ベーススタイル（PCでもスマホでも効く） */
 body {
   font-family: sans-serif;
   margin: 20px;
-  text-align: center; /* 中央揃え */
+  text-align: center;
 }
 
 h1 {
-  font-size: 2.5em; /* タイトルを大きく */
+  font-size: 2.5em;
+  margin-bottom: 20px;
 }
 
 form {
@@ -13,10 +15,19 @@ form {
 }
 
 textarea {
-  width: 80%;
-  height: 200px; /* 高さを大きく */
+  width: 90%;
+  max-width: 600px;
+  height: 200px;
   font-size: 1em;
   padding: 10px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  margin-top: 10px;
 }
 
 ul {
@@ -28,7 +39,32 @@ li {
   background: #f0f0f0;
   margin: 10px auto;
   padding: 10px;
-  width: 80%;
+  width: 90%;
+  max-width: 600px;
   text-align: left;
-  white-space: pre-wrap; /* ← 改行を保持 */
+  white-space: pre-wrap;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  border-radius: 5px;
+}
+
+/* スマホ向けスタイル（画面幅が600px以下） */
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  textarea {
+    height: 150px;
+    font-size: 1em;
+  }
+
+  button {
+    width: 80%;
+    max-width: 300px;
+  }
+
+  li {
+    font-size: 0.95em;
+  }
 }
