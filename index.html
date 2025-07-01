@@ -2,30 +2,30 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>TM memo taker</title>
+  <title>Good memo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- サイドバー：カテゴリリスト -->
   <div class="sidebar">
-    <h2>カテゴリ</h2>
+    <h2>Categories</h2>
     <ul id="categoryList"></ul>
-    <input type="text" id="newCategoryInput" placeholder="カテゴリ名" />
-    <button id="addCategoryBtn">＋追加</button>
+    <input type="text" id="newCategoryInput" placeholder="Category Name" />
+    <button id="addCategoryBtn">＋add</button>
   </div>
 
   <!-- メインエリア：メモ入力と表示 -->
   <div class="main">
     <div class="header">
       <img src="header.jpg" class="header-image" alt="ヘッダー画像" />
-      <div class="header-title">TM memo taker</div>
+      <div class="header-title">Good memo</div>
     </div>
 
     <div class="content">
       <form id="memoForm">
         <textarea id="memoInput" placeholder="メモを入力..."></textarea>
         <br />
-        <button type="submit">追加</button>
+        <button type="submit">ADD</button>
       </form>
       <ul id="memoList"></ul>
     </div>
