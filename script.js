@@ -105,7 +105,7 @@ async function fetchGeminiResponse(prompt) {
   memoList.appendChild(responseDiv);
 
   try {
-    const apiKey = "YOUR_GEMINI_API_KEY";
+    const apiKey = "AIzaSyCObgSNduMeKJ8gaupSemR0JO13Cdx0Ras";
     const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
       method: "POST",
       headers: {
