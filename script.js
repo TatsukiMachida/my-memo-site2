@@ -128,6 +128,17 @@ async function loadMemos() {
     };
     li.appendChild(editBtn);
 
+    // 削除
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "削除";
+    deleteBtn.onclick = async () => {
+      if (confirm("このメモを削除します。よろしいですか？")) {
+        await deleteDoc(doc(db, "categories", currentCategoryId, "memos", memoId));
+        loadMemos();
+      }
+    };
+    li.appendChild(deleteBtn);
+
     // 返信入力欄
     const replyInput = document.createElement("textarea");
     replyInput.className = "reply-input";
@@ -192,7 +203,10 @@ async function loadMemos() {
 // メモ追加
 memoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!currentCategoryId) return;
+  if (!currentCategoryId) {
+    alert("先にカテゴリを選択してください。");
+    return;
+  }
   const text = memoInput.value.trim();
   if (text) {
     await addDoc(collection(db, "categories", currentCategoryId, "memos"), {
