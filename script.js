@@ -50,10 +50,7 @@ async function loadCategories() {
   geminiLi.onclick = () => {
     currentCategoryId = null;
     memoList.innerHTML = "";
-    const prompt = prompt("生成AIに聞きたいことを入力してください：");
-    if (prompt) {
-      fetchGeminiResponse(prompt);
-    }
+    showGeminiInput();
   };
   categoryList.appendChild(geminiLi);
 
@@ -98,14 +95,43 @@ async function loadCategories() {
   });
 }
 
+function showGeminiInput() {
+  const container = document.createElement("div");
+  container.style.margin = "20px";
+
+  const input = document.createElement("textarea");
+  input.placeholder = "生成AIに質問を入力...";
+  input.style.width = "100%";
+  input.style.height = "80px";
+  input.style.marginBottom = "10px";
+  container.appendChild(input);
+
+  const button = document.createElement("button");
+  button.textContent = "送信";
+  button.onclick = () => {
+    const prompt = input.value.trim();
+    if (prompt) {
+      addGeminiMessage(prompt, "user");
+      fetchGeminiResponse(prompt);
+    }
+  };
+  container.appendChild(button);
+
+  memoList.appendChild(container);
+}
+
+function addGeminiMessage(text, role) {
+  const div = document.createElement("div");
+  div.className = role === "user" ? "user-bubble" : "gemini-bubble";
+  div.textContent = text;
+  memoList.appendChild(div);
+}
+
 async function fetchGeminiResponse(prompt) {
-  const responseDiv = document.createElement("div");
-  responseDiv.className = "gemini-bubble";
-  responseDiv.textContent = "生成中...";
-  memoList.appendChild(responseDiv);
+  addGeminiMessage("生成中...", "gemini");
 
   try {
-    const apiKey = "AIzaSyCObgSNduMeKJ8gaupSemR0JO13Cdx0Ras";
+    const apiKey = "YOUR_GEMINI_API_KEY";
     const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
       method: "POST",
       headers: {
@@ -117,9 +143,9 @@ async function fetchGeminiResponse(prompt) {
     });
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "エラーが発生しました。";
-    responseDiv.textContent = text;
+    memoList.lastChild.textContent = text;
   } catch (e) {
-    responseDiv.textContent = "エラー: " + e.message;
+    memoList.lastChild.textContent = "エラー: " + e.message;
   }
 }
 
