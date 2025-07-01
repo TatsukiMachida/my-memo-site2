@@ -249,3 +249,27 @@ li button:hover {
   border-right-color: #f0f0ff;
 }
 
+.user-bubble {
+  background-color: #e0f7fa;
+  color: #000;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin: 10px;
+  max-width: 80%;
+  align-self: flex-end;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.gemini-bubble {
+  background-color: #f3e5f5;
+  color: #000;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin: 10px;
+  max-width: 80%;
+  align-self: flex-start;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
