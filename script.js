@@ -54,7 +54,7 @@ async function loadCategories() {
 
     // 編集ボタン
     const editBtn = document.createElement("button");
-    editBtn.textContent = "✏️";
+    editBtn.textContent = "✎";
     editBtn.onclick = async () => {
       const newName = prompt("カテゴリ名を編集:", data.name);
       if (newName) {
