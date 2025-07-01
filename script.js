@@ -44,13 +44,58 @@ async function loadCategories() {
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const li = document.createElement("li");
-    li.textContent = data.name;
-    li.onclick = () => {
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = data.name;
+    nameSpan.style.cursor = "pointer";
+    nameSpan.onclick = () => {
       currentCategoryId = docSnap.id;
       loadMemos();
     };
+
+    // 編集ボタン
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.onclick = async () => {
+      const newName = prompt("カテゴリ名を編集:", data.name);
+      if (newName) {
+        await updateDoc(doc(db, "categories", docSnap.id), { name: newName });
+        loadCategories();
+      }
+    };
+
+    // 削除ボタン
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.onclick = async () => {
+      if (confirm("このカテゴリと中のメモを全て削除します。よろしいですか？")) {
+        await deleteAllMemos(docSnap.id);
+        await deleteDoc(doc(db, "categories", docSnap.id));
+        if (currentCategoryId === docSnap.id) currentCategoryId = null;
+        loadCategories();
+        loadMemos();
+      }
+    };
+
+    li.appendChild(nameSpan);
+    li.appendChild(editBtn);
+    li.appendChild(deleteBtn);
     categoryList.appendChild(li);
   });
+}
+
+// メモとその返信を全削除（カテゴリ削除時）
+async function deleteAllMemos(categoryId) {
+  const memosRef = collection(db, "categories", categoryId, "memos");
+  const memosSnap = await getDocs(memosRef);
+  for (const memo of memosSnap.docs) {
+    const memoId = memo.id;
+    const repliesRef = collection(db, "categories", categoryId, "memos", memoId, "replies");
+    const repliesSnap = await getDocs(repliesRef);
+    for (const reply of repliesSnap.docs) {
+      await deleteDoc(doc(repliesRef, reply.id));
+    }
+    await deleteDoc(doc(memosRef, memoId));
+  }
 }
 
 // メモ読み込み
