@@ -1,74 +1,83 @@
+// Firebase 初期化
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc,
-  serverTimestamp,
-  query,
-  orderBy
+  getFirestore, collection, doc, addDoc, getDocs, updateDoc, deleteDoc,
+  serverTimestamp, query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjPy3df4YHOpq7LiK4JPOiUueeSQLWdOs",
   authDomain: "my-memo-site2.firebaseapp.com",
   projectId: "my-memo-site2",
-  storageBucket: "my-memo-site2.firebasestorage.app",
+  storageBucket: "my-memo-site2.appspot.com",
   messagingSenderId: "315786136304",
   appId: "1:315786136304:web:32b98c73e97c10f0ad1035"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const memosCol = collection(db, "memos");
 
+// DOM取得
+const categoryList = document.getElementById("categoryList");
+const addCategoryBtn = document.getElementById("addCategoryBtn");
+const newCategoryInput = document.getElementById("newCategoryInput");
 const memoForm = document.getElementById("memoForm");
 const memoInput = document.getElementById("memoInput");
 const memoList = document.getElementById("memoList");
 
-// 日本時間でフォーマット
+let currentCategoryId = null;
+
+// 日付フォーマット
 function formatTimestamp(ts) {
   if (!ts) return "";
   const date = ts.toDate();
   return date.toLocaleString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit"
   });
 }
 
-// メモと返信を描画
+// カテゴリ読み込み
+async function loadCategories() {
+  categoryList.innerHTML = "";
+  const snapshot = await getDocs(collection(db, "categories"));
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const li = document.createElement("li");
+    li.textContent = data.name;
+    li.onclick = () => {
+      currentCategoryId = docSnap.id;
+      loadMemos();
+    };
+    categoryList.appendChild(li);
+  });
+}
+
+// メモ読み込み
 async function loadMemos() {
   memoList.innerHTML = "";
-  const q = query(memosCol, orderBy("createdAt", "desc"));
-  const snapshot = await getDocs(q);
-  for (const memoDoc of snapshot.docs) {
-    const memoData = memoDoc.data();
-    const memoId = memoDoc.id;
-
+  if (!currentCategoryId) return;
+  const memoRef = collection(db, "categories", currentCategoryId, "memos");
+  const snapshot = await getDocs(query(memoRef, orderBy("createdAt", "desc")));
+  for (const docSnap of snapshot.docs) {
+    const memo = docSnap.data();
+    const memoId = docSnap.id;
     const li = document.createElement("li");
-    const memoText = document.createElement("div");
-    memoText.textContent = memoData.text;
-    memoText.className = "memo-text";
-    li.appendChild(memoText);
+    const textDiv = document.createElement("div");
+    textDiv.textContent = memo.text;
+    li.appendChild(textDiv);
+    const dateDiv = document.createElement("div");
+    dateDiv.className = "memo-date";
+    dateDiv.textContent = formatTimestamp(memo.createdAt);
+    li.appendChild(dateDiv);
 
-    const date = document.createElement("div");
-    date.textContent = formatTimestamp(memoData.createdAt);
-    date.className = "memo-date";
-    li.appendChild(date);
-
-    // 編集ボタン
+    // 編集
     const editBtn = document.createElement("button");
     editBtn.textContent = "編集";
     editBtn.onclick = async () => {
-      const newText = prompt("メモを編集:", memoData.text);
+      const newText = prompt("編集：", memo.text);
       if (newText) {
-        await updateDoc(doc(db, "memos", memoId), { text: newText });
+        await updateDoc(doc(db, "categories", currentCategoryId, "memos", memoId), { text: newText });
         loadMemos();
       }
     };
@@ -76,8 +85,8 @@ async function loadMemos() {
 
     // 返信入力欄
     const replyInput = document.createElement("textarea");
-    replyInput.placeholder = "返信を入力...";
     replyInput.className = "reply-input";
+    replyInput.placeholder = "返信を入力...";
     li.appendChild(replyInput);
 
     const replyBtn = document.createElement("button");
@@ -85,46 +94,44 @@ async function loadMemos() {
     replyBtn.onclick = async () => {
       const text = replyInput.value.trim();
       if (text) {
-        await addDoc(collection(db, "memos", memoId, "replies"), {
+        await addDoc(collection(db, "categories", currentCategoryId, "memos", memoId, "replies"), {
           text,
           createdAt: serverTimestamp()
         });
-        replyInput.value = "";
         loadMemos();
       }
     };
     li.appendChild(replyBtn);
 
-    // 返信表示
-    const repliesCol = collection(db, "memos", memoId, "replies");
-    const repliesSnapshot = await getDocs(query(repliesCol, orderBy("createdAt", "asc")));
+    // 返信一覧
+    const repliesRef = collection(db, "categories", currentCategoryId, "memos", memoId, "replies");
+    const repliesSnap = await getDocs(query(repliesRef, orderBy("createdAt")));
     const replyList = document.createElement("ul");
     replyList.className = "reply-list";
 
-    repliesSnapshot.forEach((replyDoc) => {
-      const replyData = replyDoc.data();
+    repliesSnap.forEach(replyDoc => {
+      const reply = replyDoc.data();
       const replyId = replyDoc.id;
-
       const replyItem = document.createElement("li");
-      replyItem.textContent = `${replyData.text}（${formatTimestamp(replyData.createdAt)}）`;
+      replyItem.textContent = `${reply.text}（${formatTimestamp(reply.createdAt)}）`;
 
-      // 編集ボタン
+      // 編集
       const editReplyBtn = document.createElement("button");
       editReplyBtn.textContent = "編集";
       editReplyBtn.onclick = async () => {
-        const newText = prompt("返信を編集:", replyData.text);
+        const newText = prompt("返信を編集:", reply.text);
         if (newText) {
-          await updateDoc(doc(db, "memos", memoId, "replies", replyId), { text: newText });
+          await updateDoc(doc(db, "categories", currentCategoryId, "memos", memoId, "replies", replyId), { text: newText });
           loadMemos();
         }
       };
       replyItem.appendChild(editReplyBtn);
 
-      // 削除ボタン
+      // 削除
       const deleteReplyBtn = document.createElement("button");
       deleteReplyBtn.textContent = "削除";
       deleteReplyBtn.onclick = async () => {
-        await deleteDoc(doc(db, "memos", memoId, "replies", replyId));
+        await deleteDoc(doc(db, "categories", currentCategoryId, "memos", memoId, "replies", replyId));
         loadMemos();
       };
       replyItem.appendChild(deleteReplyBtn);
@@ -137,12 +144,13 @@ async function loadMemos() {
   }
 }
 
-// メモ新規追加
+// メモ追加
 memoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (!currentCategoryId) return;
   const text = memoInput.value.trim();
   if (text) {
-    await addDoc(memosCol, {
+    await addDoc(collection(db, "categories", currentCategoryId, "memos"), {
       text,
       createdAt: serverTimestamp()
     });
@@ -151,4 +159,13 @@ memoForm.addEventListener("submit", async (e) => {
   }
 });
 
-loadMemos();
+// カテゴリ追加
+addCategoryBtn.addEventListener("click", async () => {
+  const name = newCategoryInput.value.trim();
+  if (!name) return;
+  const ref = await addDoc(collection(db, "categories"), { name });
+  newCategoryInput.value = "";
+  loadCategories();
+});
+
+loadCategories();
