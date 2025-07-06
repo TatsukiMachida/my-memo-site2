@@ -128,7 +128,7 @@ function addGeminiMessage(text, role) {
 }
 
 async function callDifyAPI(userMessage) {
-  const response = await fetch("https://api.dify.ai/v1/chat-messages", {
+  const response = await fetch("https://api.dify.ai/v1", {
     method: "POST",
     headers: {
       "Authorization": "Bearer app-Nw6J00ilQ0pjyORAvBqiFYh8",
