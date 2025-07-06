@@ -132,7 +132,7 @@ async function callDifyAPI(userMessage) {
     const response = await fetch("https://api.dify.ai/v1/chat-messages", {
       method: "POST",
       headers: {
-        "Authorization": "Bearer YOUR_DIFY_API_KEY",
+        "Authorization": "Bearer app-Nw6J00ilQ0pjyORAvBqiFYh8",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
