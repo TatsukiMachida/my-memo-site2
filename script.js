@@ -128,21 +128,32 @@ function addGeminiMessage(text, role) {
 }
 
 async function callDifyAPI(userMessage) {
-  const response = await fetch("https://api.dify.ai/v1", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer app-Nw6J00ilQ0pjyORAvBqiFYh8",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      inputs: {},
-      query: userMessage,
-      response_mode: "blocking"
-    })
-  });
+  try {
+    const response = await fetch("https://api.dify.ai/v1/chat-messages", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer YOUR_DIFY_API_KEY",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        inputs: {},
+        query: userMessage,
+        response_mode: "blocking"
+      })
+    });
 
-  const data = await response.json();
-  return data.answer || "エラー：回答が取得できませんでした";
+    const data = await response.json();
+    console.log("Dify API 応答:", data);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} - ${data.message || response.statusText}`);
+    }
+
+    return data.answer || "（注意）Dify応答形式が変わったか、データが空です";
+  } catch (err) {
+    console.error("Dify API 呼び出しエラー:", err);
+    return `エラー：${err.message}`;
+  }
 }
 
 loadCategories();
