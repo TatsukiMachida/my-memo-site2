@@ -27,7 +27,6 @@ const memoList = document.getElementById("memoList");
 
 let currentCategoryId = null;
 
-// 日付フォーマット
 function formatTimestamp(ts) {
   if (!ts) return "";
   const date = ts.toDate();
@@ -37,11 +36,9 @@ function formatTimestamp(ts) {
   });
 }
 
-// カテゴリ読み込み
 async function loadCategories() {
   categoryList.innerHTML = "";
 
-  // Gemini AI カテゴリ追加
   const geminiLi = document.createElement("li");
   geminiLi.textContent = "生成AI";
   geminiLi.style.backgroundColor = "purple";
@@ -108,11 +105,14 @@ function showGeminiInput() {
 
   const button = document.createElement("button");
   button.textContent = "送信";
-  button.onclick = () => {
+  button.onclick = async () => {
     const prompt = input.value.trim();
     if (prompt) {
       addGeminiMessage(prompt, "user");
-      fetchGeminiResponse(prompt);
+      addGeminiMessage("生成中...", "gemini");
+
+      const answer = await callDifyAPI(prompt);
+      memoList.lastChild.textContent = answer;
     }
   };
   container.appendChild(button);
@@ -127,26 +127,22 @@ function addGeminiMessage(text, role) {
   memoList.appendChild(div);
 }
 
-async function fetchGeminiResponse(prompt) {
-  addGeminiMessage("生成中...", "gemini");
+async function callDifyAPI(userMessage) {
+  const response = await fetch("https://api.dify.ai/v1/chat-messages", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer YOUR_DIFY_API_KEY",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      inputs: {},
+      query: userMessage,
+      response_mode: "blocking"
+    })
+  });
 
-  try {
-    const apiKey = "AIzaSyCObgSNduMeKJ8gaupSemR0JO13Cdx0Ras";
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
-    });
-    const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "エラーが発生しました。";
-    memoList.lastChild.textContent = text;
-  } catch (e) {
-    memoList.lastChild.textContent = "エラー: " + e.message;
-  }
+  const data = await response.json();
+  return data.answer || "エラー：回答が取得できませんでした";
 }
 
 loadCategories();
